@@ -1,0 +1,49 @@
+name: ui-preview-deploy-action
+
+description: Deploys Storybooks of Yandex Cloud UI packages to S3
+
+inputs:
+  project:
+    description: ID of your project
+    required: true
+  workflow:
+    description: Workflow id where the artifactes are created
+    required: true
+  workflow-run:
+    description: Specific workflow run id to use
+    required: true
+  github-token:
+    description: PAT of a GitHub user which creates PR's deploy commit
+    required: true
+  s3-key-id:
+    description: S3 key id
+    required: true
+  s3-secret-key:
+    description: S3 secret key
+    required: true
+
+runs:
+  using: composite
+  steps:
+  - name: Download Artifacts
+    uses: dawidd6/action-download-artifact@v2
+    with:
+      workflow: ${{ input.workflow }}
+      run_id: ${{ input.workflow-run }}
+  - name: Extract PR Number
+    id: pr
+    run: echo "::set-output name=id::$(<pr/pr-id.txt)"
+    shell: bash
+  - name: Upload to S3
+    env:
+      AWS_ACCESS_KEY_ID: ${{ inputs.s3-key-id }}
+      AWS_SECRET_ACCESS_KEY: ${{ inputs.s3-secret-key }}
+      AWS_DEFAULT_REGION: ru-central1
+      AWS_EC2_METADATA_DISABLED: true
+    run: aws s3 cp . s3://storybook-static/uikit/pulls/${{ steps.pr.outputs.id }}/ --endpoint-url=https://storage.yandexcloud.net --recursive
+  - name: Create Comment
+    uses: marocchino/sticky-pull-request-comment@v2
+    with:
+      GITHUB_TOKEN: ${{ inputs.github-token }}
+      number: ${{ steps.pr.outputs.id }}
+      message: '[Preview](https://storybook-static.website.yandexcloud.net/${{ inputs.project }}/pulls/${{ steps.pr.outputs.id }}/) is ready.'

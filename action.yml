@@ -6,17 +6,11 @@ inputs:
   project:
     description: ID of your project
     required: true
-  workflow:
-    description: Workflow id where the artifactes are created
-    required: true
-  workflow-run:
-    description: Specific workflow run id to use
-    required: true
   github-token:
-    description: PAT of a GitHub user which creates PR's deploy commit
+    description: PAT of a GitHub user which maintains PR's deploy comment
     required: true
   s3-key-id:
-    description: S3 key id
+    description: S3 key ID
     required: true
   s3-secret-key:
     description: S3 secret key
@@ -28,8 +22,8 @@ runs:
   - name: Download Artifacts
     uses: dawidd6/action-download-artifact@v2
     with:
-      workflow: ${{ input.workflow }}
-      run_id: ${{ input.workflow-run }}
+      workflow: ${{ github.event.workflow_run.workflow_id }}
+      run_id: ${{ github.event.workflow_run.id }}
   - name: Extract PR Number
     id: pr
     run: echo "::set-output name=id::$(<pr/pr-id.txt)"

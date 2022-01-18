@@ -41,4 +41,4 @@ runs:
     with:
       GITHUB_TOKEN: ${{ inputs.github-token }}
       number: ${{ steps.pr.outputs.id }}
-      message: '[Preview](https://storybook-static.website.yandexcloud.net/${{ inputs.project }}/pulls/${{ steps.pr.outputs.id }}/) is ready.'
+      message: '[Preview](https://preview.yandexcloud.dev/${{ inputs.project }}/${{ steps.pr.outputs.id }}/) is ready.'

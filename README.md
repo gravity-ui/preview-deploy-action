@@ -1,4 +1,7 @@
-# ui-preview-deploy-action
+# preview-deploy-action
+
+A GitHub action that deploys Storybook's static files to S3.
+It's the second action of sequence "Build -> Deploy".
 
 ## Inputs
 
@@ -26,7 +29,7 @@ jobs:
       github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     steps:
-    - uses: yandex-cloud/ui-preview-deploy-action@master
+    - uses: gravity-ui/preview-deploy-action@v1
       with:
         project: uikit
         github-token: ${{ secrets.YC_UI_BOT_GITHUB_TOKEN }}

@@ -29,7 +29,7 @@ runs:
     run: echo "::set-output name=id::$(<pr/pr-id.txt)"
     shell: bash
   - name: Upload to S3
-    uses: gravity-ui/upload-to-s3-action@v1
+    uses: gravity-ui/upload-to-s3-action@861491d60cfc29116e9ba4a53a34a857b9c5cb00
     with:
       src-path: static
       dest-path: /${{ inputs.project }}/pulls/${{ steps.pr.outputs.id }}/

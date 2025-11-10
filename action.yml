@@ -19,16 +19,25 @@ inputs:
 runs:
   using: composite
   steps:
-  - name: Deploy Storybook Preview
-    uses: gravity-ui/deploy-to-s3-action@v1
+  - name: Download Artifacts
+    uses: actions/download-artifact@v4
     with:
-      project: ${{ inputs.project }}
-      src-path: static
-      bucket: storybook-static
-      endpoint-url: https://storage.yandexcloud.net
-      preview-base-url: https://preview.gravity-ui.com
-      comment-message: '[Preview]({url}) is ready.'
       github-token: ${{ inputs.github-token }}
+      run-id: ${{ github.event.workflow_run.id }}
+  - name: Extract PR Number
+    id: pr
+    run: echo "::set-output name=id::$(<pr/pr-id.txt)"
+    shell: bash
+  - name: Upload to S3
+    uses: gravity-ui/preview-upload-to-s3-action@v1
+    with:
+      src-path: static
+      dest-path: /${{ inputs.project }}/pulls/${{ steps.pr.outputs.id }}/
       s3-key-id: ${{ inputs.s3-key-id }}
       s3-secret-key: ${{ inputs.s3-secret-key }}
-      region: ru-central1
+  - name: Create Comment
+    uses: marocchino/sticky-pull-request-comment@v2
+    with:
+      GITHUB_TOKEN: ${{ inputs.github-token }}
+      number: ${{ steps.pr.outputs.id }}
+      message: '[Preview](https://preview.gravity-ui.com/${{ inputs.project }}/${{ steps.pr.outputs.id }}/) is ready.'

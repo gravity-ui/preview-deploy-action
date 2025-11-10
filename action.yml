@@ -29,12 +29,15 @@ runs:
     run: echo "::set-output name=id::$(<pr/pr-id.txt)"
     shell: bash
   - name: Upload to S3
-    uses: gravity-ui/preview-upload-to-s3-action@v1
+    uses: gravity-ui/upload-to-s3-action@v1
     with:
       src-path: static
       dest-path: /${{ inputs.project }}/pulls/${{ steps.pr.outputs.id }}/
+      bucket: storybook-static
+      endpoint-url: https://storage.yandexcloud.net
       s3-key-id: ${{ inputs.s3-key-id }}
       s3-secret-key: ${{ inputs.s3-secret-key }}
+      region: ru-central1
   - name: Create Comment
     uses: marocchino/sticky-pull-request-comment@v2
     with:
